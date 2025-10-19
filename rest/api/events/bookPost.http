@@ -1,0 +1,7 @@
+POST http://localhost/api/events/598986bc-d31e-495a-aa88-d7236d625852/book
+Content-Type: application/json
+
+{
+    "clientId": "598986bc-d31e-495a-aa88-d7236d625852",
+    "clientEmail": "test@example.com"
+}

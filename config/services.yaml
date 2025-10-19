@@ -15,6 +15,22 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Додайте цей блок, щоб Symfony сканував ВСІ контролери в новій структурі
+    App\Booking\UserInterface\Controller\:
+        resource: '../src/Booking/UserInterface/Controller/'
+        tags: ['controller.service_arguments']
+
+    # Якщо у вас будуть інші домени, ви додасте їх так само
+    # App\Payments\UserInterface\Controller\:
+    #    resource: '../src/Payments/UserInterface/Controller/'
+    #    tags: ['controller.service_arguments']
+
+    # Цей запис каже Symfony:
+    # "Якщо хтось попросить (type-hint) EventRepositoryInterface..."
+    App\Booking\Domain\Repository\EventRepositoryInterface:
+        # "...насправді дай йому сервіс DoctrineEventRepository"
+        alias: App\Booking\Infrastructure\Repository\DoctrineEventRepository

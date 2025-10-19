@@ -1,0 +1,7 @@
+# config/packages/test/messenger.yaml
+framework:
+    messenger:
+        transports:
+            # "Перехоплюємо" всі повідомлення, що йдуть на транспорт 'async'
+            # і кладемо їх у "in-memory" сховище замість RabbitMQ
+            async: 'in-memory://'

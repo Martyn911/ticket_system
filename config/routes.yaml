@@ -1,5 +1,5 @@
 controllers:
     resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+        path: ../src/Booking/UserInterface/Controller/
+        namespace: App\Booking\UserInterface\Controller
     type: attribute
