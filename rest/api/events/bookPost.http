@@ -1,4 +1,4 @@
-POST http://localhost/api/events/598986bc-d31e-495a-aa88-d7236d625852/book
+POST http://localhost/api/events/{eventId}/book
 Content-Type: application/json
 
 {
