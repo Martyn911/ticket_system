@@ -12,37 +12,45 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: ⬇️ Checkout code
-              uses: actions/checkout@v4
+            -   name: ⬇️ Checkout code
+                uses: actions/checkout@v4
 
-            - name: 🐳 Set up Docker Compose
+            -   name: 🐳 Set up Docker Compose
                 # Запускаємо ваші сервіси, як описано в docker-compose.yml
-              run: docker compose up -d --build
+                run: docker compose up -d --build
 
-            - name: ⏳ Wait for services to be ready
+            -   name: ⏳ Wait for services to be ready
                 # Чекаємо на повну готовність бази даних та RabbitMQ
-              run: docker compose exec php-fpm sh -c "until nc -z database 5432; do echo Waiting for DB; sleep 1; done;"
+                run: docker compose exec php-fpm sh -c "until nc -z database 5432; do echo Waiting for DB; sleep 1; done;"
 
-            - name: 📦 Install Composer dependencies
+            -   name: 📦 Install Composer dependencies
                 # Запуск Composer всередині Docker-контейнера
-              run: docker compose exec php-fpm composer install --no-interaction --prefer-dist
+                run: docker compose exec php-fpm composer install --no-interaction --prefer-dist
 
-            - name: 💿 Run Database Migrations
+            -   name: 💿 Run Database Migrations
                 # Створення схеми БД для тестів
-              run: docker compose exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
+                run: docker compose exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 
-            - name: ⚙️ Clear Symfony Cache
+            -   name: ➕ Create Test Database
+                # Створює базу даних, визначену у DATABASE_URL з суфіксом '_test'
+                run: docker compose exec php-fpm php bin/console doctrine:database:create --env=test --if-not-exists
+
+            -   name: 🛠️ Setup Test Database Schema
+                # Застосовує схему/міграції до новоствореної тестової БД
+                run: docker compose exec php-fpm php bin/console doctrine:schema:update --force --env=test
+
+            -   name: ⚙️ Clear Symfony Cache
                 # Очищення кешу перед аналізом
-              run: docker compose exec php-fpm php bin/console cache:clear
+                run: docker compose exec php-fpm php bin/console cache:clear
 
-            - name: 🛡️ Run PHPStan Static Analysis
+            -   name: 🛡️ Run PHPStan Static Analysis
                 # Запуск PHPStan. Зверніть увагу на `--memory-limit` та прямий шлях!
-              run: docker compose exec php-fpm ./vendor/bin/phpstan analyse src tests --level 9 --memory-limit=512M
+                run: docker compose exec php-fpm ./vendor/bin/phpstan analyse src tests --level 9 --memory-limit=512M
 
-            - name: 🎨 Run PHP-CS-Fixer Check
+            -   name: 🎨 Run PHP-CS-Fixer Check
                 # Перевірка стандартів кодування (dry-run). Якщо є порушення, пайплайн впаде.
-              run: docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff
+                run: docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
             # Опціонально, але рекомендовано: запуск PHPUnit тестів
-            - name: ✅ Run PHPUnit Tests
-              run: docker compose exec php-fpm php bin/phpunit
+            -   name: ✅ Run PHPUnit Tests
+                run: docker compose exec php-fpm php bin/phpunit
