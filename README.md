@@ -208,7 +208,7 @@ docker compose exec php-fpm ./vendor/bin/phpstan analyse src tests --level 9 --m
 Показує, які файли потребують виправлення, але не змінює їх:
 
 ```bash
-docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff src tests
+docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
 
 #### Виправлення (Fix)
@@ -216,7 +216,7 @@ docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff src t
 **УВАГА:** Команда модифікує ваші файли.
 
 ```bash
-docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix src tests
+docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix
 ```
 
 -----
