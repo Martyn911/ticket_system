@@ -35,8 +35,11 @@ class CreateEventCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        /** @var string $name */
         $name = $input->getArgument('name');
-        $tickets = (int) $input->getArgument('tickets');
+        /** @var int $tickets */
+        $tickets = $input->getArgument('tickets');
 
         if ($tickets <= 0) {
             $io->error('The number of tickets must be greater than zero.');

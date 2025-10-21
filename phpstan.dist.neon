@@ -1,8 +1,26 @@
+includes:
+    # 1. Додає стандартні правила Symfony та Doctrine (через phpstan-symfony)
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+
 parameters:
-    level: 6
+    # ====== Секція Symfony Integration (для коректної роботи) ======
+    symfony:
+        # Шлях до kernel: допомагає PHPStan зрозуміти, як ініціалізувати Symfony
+        containerXmlPath: '%rootDir%/../../../var/cache/dev/App_KernelDevDebugContainer.xml'
+
+        # Шляхи до файлів конфігурації, якщо вони не стандартні
+        # console_application_loader: App\Tests\ConsoleApplicationLoader::run
+
+    # ====== Секція Doctrine Integration (якщо використовуєте Doctrine) ======
+    doctrine:
+        # Шлях до файлів конфігурації Doctrine. Зазвичай не потрібно змінювати,
+        # якщо ви використовуєте стандартну конфігурацію Symfony/Doctrine.
+        # object_manager_loader: App\Tests\ObjectManagerLoader::getDoctrineObjectManager
+
+    # ====== Секція Основних Налаштувань PHPStan ======
+    level: 9
+
     paths:
-        - bin/
-        - config/
-        - public/
-        - src/
-        - tests/
+        - src
+        - tests

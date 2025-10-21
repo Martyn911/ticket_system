@@ -196,7 +196,7 @@
 
 ```bash
 # Запуск PHPStan на 9-му рівні строгості для тек src та tests
-docker compose exec php-fpm ./vendor/bin/phpstan analyse src tests --level 9
+docker compose exec php-fpm ./vendor/bin/phpstan analyse src tests --level 9 --memory-limit=512M
 ```
 
 ### 2\. Перевірка та Виправлення Стандартів Кодування (PHP-CS-Fixer)

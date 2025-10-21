@@ -12,7 +12,7 @@ class DoctrineEventRepository implements EventRepositoryInterface
     private EntityManagerInterface $em;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<Event>
      */
     private $entityRepository;
 

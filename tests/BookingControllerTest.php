@@ -2,17 +2,22 @@
 
 namespace App\Tests;
 
-use App\Booking\Domain\Entity\Event;
 use App\Booking\Application\Service\BookingService;
+use App\Booking\Domain\Entity\Event;
 use App\Booking\Domain\Repository\EventRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BookingControllerTest extends WebTestCase
 {
-    private $client;
-    private $entityManager;
-    private $eventRepository;
+    // Рядок 13: Помилка missingType.property
+    private KernelBrowser $client;
+
+    private EntityManagerInterface $entityManager;
+
+    private EventRepositoryInterface $eventRepository;
 
     protected function setUp(): void
     {
@@ -35,11 +40,12 @@ class BookingControllerTest extends WebTestCase
     {
         $event = new Event('Test Concert', $tickets);
         $this->eventRepository->save($event);
+
         return $event;
     }
 
     /**
-     * Тест №1: Щасливий шлях (HTTP 202 + Повідомлення в черзі)
+     * Тест №1: Щасливий шлях (HTTP 202 + Повідомлення в черзі).
      */
     public function testBookingSuccessful(): void
     {
@@ -49,10 +55,10 @@ class BookingControllerTest extends WebTestCase
         // 2. Робимо запит
         $this->client->request(
             'POST',
-            '/api/events/' . $event->getId() . '/book',
+            '/api/events/'.$event->getId().'/book',
             [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            '{"clientId": "' . $event->getId() . '", "clientEmail": "test@example.com"}'
+            '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
         // 3. Перевіряємо відповідь
@@ -66,7 +72,7 @@ class BookingControllerTest extends WebTestCase
     }
 
     /**
-     * Тест №2: Квитки закінчилися (HTTP 400)
+     * Тест №2: Квитки закінчилися (HTTP 400).
      */
     public function testBookingFailsWhenNoTicketsLeft(): void
     {
@@ -76,19 +82,19 @@ class BookingControllerTest extends WebTestCase
         // 2. Робимо запит
         $this->client->request(
             'POST',
-            '/api/events/' . $event->getId() . '/book',
+            '/api/events/'.$event->getId().'/book',
             [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            '{"clientId": "' . $event->getId() . '", "clientEmail": "test@example.com"}'
+            '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
         // 3. Перевіряємо відповідь (це DomainException)
         $this->assertResponseStatusCodeSame(400); // HTTP 400 Bad Request
-        $this->assertStringContainsString('No tickets left', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('No tickets left', (string) $this->client->getResponse()->getContent());
     }
 
     /**
-     * Тест №3: Симуляція Race Condition (HTTP 409)
+     * Тест №3: Симуляція Race Condition (HTTP 409).
      */
     public function testBookingFailsOnRaceCondition(): void
     {
@@ -102,7 +108,7 @@ class BookingControllerTest extends WebTestCase
         $bookingServiceMock = $this->createMock(BookingService::class);
         $bookingServiceMock
             ->method('bookTicket') // При виклику методу bookTicket...
-            ->willThrowException(new OptimisticLockException("Mock lock exception", null)); // ...кинь помилку OptimisticLock
+            ->willThrowException(new OptimisticLockException('Mock lock exception', null)); // ...кинь помилку OptimisticLock
 
         // Замінюємо справжній сервіс на наш мок
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -110,48 +116,48 @@ class BookingControllerTest extends WebTestCase
         // 3. Робимо запит
         $this->client->request(
             'POST',
-            '/api/events/' . $event->getId() . '/book',
+            '/api/events/'.$event->getId().'/book',
             [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            '{"clientId": "' . $event->getId() . '", "clientEmail": "test@example.com"}'
+            '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
         // 4. Перевіряємо, що контролер правильно обробив цю помилку
         $this->assertResponseStatusCodeSame(409); // HTTP 409 Conflict
-        $this->assertStringContainsString('someone just booked the last ticket', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('someone just booked the last ticket', (string) $this->client->getResponse()->getContent());
     }
 
     /**
-     * Тест №4: Некоректний UUID у clientId -> 400
+     * Тест №4: Некоректний UUID у clientId -> 400.
      */
     public function testBookingFailsOnInvalidClientId(): void
     {
         $event = $this->createTestEvent(1);
         $this->client->request(
             'POST',
-            '/api/events/' . $event->getId() . '/book',
+            '/api/events/'.$event->getId().'/book',
             [], [],
             ['CONTENT_TYPE' => 'application/json'],
             '{"clientId": "not-a-uuid", "clientEmail": "test@example.com"}'
         );
         $this->assertResponseStatusCodeSame(400);
-        $this->assertStringContainsString('errors', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('errors', (string) $this->client->getResponse()->getContent());
     }
 
     /**
-     * Тест №5: Некоректний email -> 400
+     * Тест №5: Некоректний email -> 400.
      */
     public function testBookingFailsOnInvalidEmail(): void
     {
         $event = $this->createTestEvent(1);
         $this->client->request(
             'POST',
-            '/api/events/' . $event->getId() . '/book',
+            '/api/events/'.$event->getId().'/book',
             [], [],
             ['CONTENT_TYPE' => 'application/json'],
-            '{"clientId": "' . $event->getId() . '", "clientEmail": "bad-email"}'
+            '{"clientId": "'.$event->getId().'", "clientEmail": "bad-email"}'
         );
         $this->assertResponseStatusCodeSame(400);
-        $this->assertStringContainsString('errors', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('errors', (string) $this->client->getResponse()->getContent());
     }
 }
