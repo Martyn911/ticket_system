@@ -7,6 +7,7 @@ class SendConfirmationEmail
     public function __construct(
         public readonly string $bookingId,
         public readonly string $clientEmail,
-        public readonly int $ticketNumber
-    ) {}
+        public readonly int $ticketNumber,
+    ) {
+    }
 }

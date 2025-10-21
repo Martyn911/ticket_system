@@ -3,8 +3,8 @@
 namespace App\Booking\Application\MessageHandler;
 
 use App\Booking\Application\Message\SendConfirmationEmail;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Email;
 
 #[AsMessageHandler]

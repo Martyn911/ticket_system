@@ -17,8 +17,9 @@ class BookingService
     public function __construct(
         private EntityManagerInterface $em,
         private EventRepositoryInterface $eventRepository,
-        private MessageBusInterface $bus
-    ) {}
+        private MessageBusInterface $bus,
+    ) {
+    }
 
     /**
      * @throws EventNotFound
@@ -29,8 +30,7 @@ class BookingService
         // Ця функція запускає все в транзакції
         // Якщо всередині станеться помилка (включно з OptimisticLockException),
         // транзакція відкотиться.
-        $this->em->wrapInTransaction(function() use ($command) {
-
+        $this->em->wrapInTransaction(function () use ($command) {
             // 1. Знаходимо подію
             $event = $this->eventRepository->find($command->eventId);
             if (!$event) {

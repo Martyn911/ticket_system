@@ -7,6 +7,7 @@ class BookTicketCommand
     public function __construct(
         public readonly string $eventId,
         public readonly string $clientId,
-        public readonly string $clientEmail
-    ) {}
+        public readonly string $clientEmail,
+    ) {
+    }
 }

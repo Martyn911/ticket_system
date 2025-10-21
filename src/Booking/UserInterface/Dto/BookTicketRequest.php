@@ -18,5 +18,6 @@ class BookTicketRequest
         #[Assert\NotBlank]
         #[Assert\Email]
         public readonly string $clientEmail,
-    ) {}
+    ) {
+    }
 }

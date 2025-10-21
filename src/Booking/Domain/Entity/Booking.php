@@ -10,7 +10,7 @@ class Booking
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: "NONE")]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private Uuid $id;
 
     #[ORM\Column(type: 'uuid')]
@@ -24,7 +24,7 @@ class Booking
 
     public function __construct(Uuid $id, Uuid $clientId, Uuid $eventId, int $ticketNumber)
     {
-        $this->id = $id; // use provided id, do not regenerate
+        $this->id = $id;
         $this->clientId = $clientId;
         $this->eventId = $eventId;
         $this->ticketNumber = $ticketNumber;

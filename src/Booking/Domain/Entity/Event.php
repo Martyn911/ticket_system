@@ -2,9 +2,9 @@
 
 namespace App\Booking\Domain\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use App\Booking\Domain\ValueObject\Ticket;
 use App\Booking\Domain\Exception\TicketsSoldOut;
+use App\Booking\Domain\ValueObject\Ticket;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
@@ -41,10 +41,10 @@ class Event
     {
         // ГОЛОВНЕ БІЗНЕС-ПРАВИЛО (ІНВАРІАНТ)
         if ($this->soldTickets >= $this->totalTickets) {
-            throw new TicketsSoldOut('No tickets left for event: ' . $this->name);
+            throw new TicketsSoldOut('No tickets left for event: '.$this->name);
         }
 
-        $this->soldTickets++;
+        ++$this->soldTickets;
 
         // Створюємо Квиток (Value Object)
         return new Ticket($this->id, Uuid::fromString($clientId), $this->soldTickets);

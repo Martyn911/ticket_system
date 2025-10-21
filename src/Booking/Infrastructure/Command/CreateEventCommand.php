@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Uuid;
 class CreateEventCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
@@ -40,6 +40,7 @@ class CreateEventCommand extends Command
 
         if ($tickets <= 0) {
             $io->error('The number of tickets must be greater than zero.');
+
             return Command::FAILURE;
         }
 
@@ -66,9 +67,9 @@ class CreateEventCommand extends Command
             $output->writeln("\n<info>Event ID for testing:</info> <comment>{$event->getId()}</comment>\n");
 
             return Command::SUCCESS;
-
         } catch (\Exception $e) {
-            $io->error('An error occurred while creating the event: ' . $e->getMessage());
+            $io->error('An error occurred while creating the event: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

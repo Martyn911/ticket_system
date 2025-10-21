@@ -35,6 +35,7 @@ class BookingController extends AbstractController
                     'message' => $violation->getMessage(),
                 ];
             }
+
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
@@ -46,9 +47,10 @@ class BookingController extends AbstractController
 
         try {
             $bookingService->bookTicket($command);
+
             return $this->json([
                 'status' => 'booking_accepted',
-                'message' => 'Your booking is being processed.'
+                'message' => 'Your booking is being processed.',
             ], Response::HTTP_ACCEPTED);
         } catch (EventNotFound $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
