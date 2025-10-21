@@ -41,7 +41,7 @@ jobs:
 
             - name: 🎨 Run PHP-CS-Fixer Check
                 # Перевірка стандартів кодування (dry-run). Якщо є порушення, пайплайн впаде.
-              run: docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff src tests
+              run: docker compose exec php-fpm ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
             # Опціонально, але рекомендовано: запуск PHPUnit тестів
             - name: ✅ Run PHPUnit Tests
