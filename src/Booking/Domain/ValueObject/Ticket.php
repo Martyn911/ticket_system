@@ -5,8 +5,8 @@ namespace App\Booking\Domain\ValueObject;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Value Object, що представляє виданий квиток.
- * Його ідентичність визначається комбінацією EventId та номера квитка.
+ * Value Object representing an issued ticket.
+ * Its identity is determined by the combination of EventId and ticket number.
  */
 class Ticket
 {
@@ -37,13 +37,13 @@ class Ticket
     }
 
     /**
-     * Перевіряє, чи два об'єкти Ticket є рівними.
-     * Два квитки рівні, якщо їхні атрибути рівні.
+     * Checks whether two Ticket objects are equal.
+     * Two tickets are equal if their attributes are equal.
      */
     public function equals(self $other): bool
     {
         return $this->eventId->equals($other->eventId)
             && $this->ticketNumber === $other->ticketNumber;
-        // clientId можна не включати в рівність, якщо він не є частиною унікальності квитка
+        // clientId may be excluded from equality if it is not part of the ticket's uniqueness
     }
 }

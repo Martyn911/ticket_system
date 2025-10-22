@@ -48,14 +48,14 @@ class CreateEventCommand extends Command
         }
 
         try {
-            // 1. Створення Event (використовуємо конструктор сутності для ініціалізації)
-            // Ми не використовуємо EventId VO, оскільки нам потрібна стрічка для Uuid::v4()
+            // 1. Create Event (use the entity constructor for initialization)
+            // We do not use EventId VO here because we need a string for Uuid::v4()
             $event = new Event(
                 $name,
                 $tickets
             );
 
-            // 2. Збереження через EntityManager
+            // 2. Persist via EntityManager
             $this->entityManager->persist($event);
             $this->entityManager->flush();
 
@@ -63,10 +63,10 @@ class CreateEventCommand extends Command
                 'Successfully created event "%s" with %d total tickets. ID: %s',
                 $name,
                 $tickets,
-                $event->getId() // Отримуємо ID для подальшого використання
+                $event->getId() // Get ID for further use
             ));
 
-            // Виводимо ID ще раз, щоб його було легко скопіювати для ab-тесту
+            // Output the ID again to make it easy to copy for the ab test
             $output->writeln("\n<info>Event ID for testing:</info> <comment>{$event->getId()}</comment>\n");
 
             return Command::SUCCESS;

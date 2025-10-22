@@ -2,6 +2,6 @@
 framework:
     messenger:
         transports:
-            # "Перехоплюємо" всі повідомлення, що йдуть на транспорт 'async'
-            # і кладемо їх у "in-memory" сховище замість RabbitMQ
+            # Intercept all messages sent to the 'async' transport
+            # and store them in the in-memory transport instead of RabbitMQ
             async: 'in-memory://'

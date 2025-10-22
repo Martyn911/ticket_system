@@ -16,7 +16,7 @@ class SendConfirmationEmailHandler
 
     public function __invoke(SendConfirmationEmail $message): void
     {
-        // Імітуємо повільну роботу
+        // Simulate slow processing
         sleep(5);
 
         $email = (new Email())

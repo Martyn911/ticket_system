@@ -22,7 +22,7 @@ class Event
     #[ORM\Column(type: 'integer')]
     private int $soldTickets = 0;
 
-    // ДОДАЄМО ПОЛЕ ДЛЯ ОПТИМІСТИЧНОГО БЛОКУВАННЯ (Race Condition)
+    // Add a field for optimistic locking (to handle race conditions)
     #[ORM\Version]
     #[ORM\Column(type: 'integer')]
     private int $version;
@@ -39,14 +39,14 @@ class Event
      */
     public function bookTicket(string $clientId): Ticket
     {
-        // ГОЛОВНЕ БІЗНЕС-ПРАВИЛО (ІНВАРІАНТ)
+        // CORE BUSINESS RULE (INVARIANT)
         if ($this->soldTickets >= $this->totalTickets) {
             throw new TicketsSoldOut('No tickets left for event: '.$this->name);
         }
 
         ++$this->soldTickets;
 
-        // Створюємо Квиток (Value Object)
+        // Create a Ticket (Value Object)
         return new Ticket($this->id, Uuid::fromString($clientId), $this->soldTickets);
     }
 

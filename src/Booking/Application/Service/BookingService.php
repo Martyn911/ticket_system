@@ -27,22 +27,22 @@ class BookingService
      */
     public function bookTicket(BookTicketCommand $command): void
     {
-        // Ця функція запускає все в транзакції
-        // Якщо всередині станеться помилка (включно з OptimisticLockException),
-        // транзакція відкотиться.
+        // This method runs everything inside a transaction
+        // If an error occurs inside (including OptimisticLockException),
+        // the transaction will be rolled back.
         $this->em->wrapInTransaction(function () use ($command) {
-            // 1. Знаходимо подію
+            // 1. Find the event
             $event = $this->eventRepository->find($command->eventId);
             if (!$event) {
                 throw new EventNotFound('Event not found.');
             }
 
-            // 2. Викликаємо доменну логіку
-            // Тут може викинутись TicketsSoldOut,
-            // якщо квитки закінчились.
+            // 2. Invoke domain logic
+            // TicketsSoldOut may be thrown here
+            // if tickets are sold out.
             $ticket = $event->bookTicket($command->clientId);
 
-            // 3. Створюємо сутність Booking
+            // 3. Create Booking entity
             $booking = new Booking(
                 Uuid::v4(),
                 Uuid::fromString($command->clientId),
@@ -50,13 +50,13 @@ class BookingService
                 $ticket->getNumber()
             );
 
-            // 4. Зберігаємо все
-            // EntityManager збереже і Event, і Booking
+            // 4. Persist everything
+            // The EntityManager will persist both Event and Booking
             $this->em->persist($booking);
             $this->em->persist($event);
-            // $this->em->flush() буде викликано автоматично
+            // $this->em->flush() will be called automatically
 
-            // 5. Відправляємо повідомлення в RabbitMQ (після успіху транзакції)
+            // 5. Send a message to RabbitMQ (after the transaction succeeds)
             $this->bus->dispatch(new SendConfirmationEmail(
                 $booking->getId()->toRfc4122(),
                 $command->clientEmail,

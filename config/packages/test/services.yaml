@@ -1,10 +1,9 @@
 services:
-    # Ми робимо нашу *конкретну реалізацію* репозиторію публічною
+    # Make our concrete repository implementation public
     App\Booking\Infrastructure\Repository\DoctrineEventRepository:
         autowire: true
         public: true
 
-    # Ми також робимо *аліас* (інтерфейс), за яким ми
-    # звертаємось до сервісу, публічним
+    # Also make the alias (interface) used to access the service public
     App\Booking\Domain\Repository\EventRepositoryInterface:
         public: true
