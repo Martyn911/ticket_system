@@ -57,7 +57,7 @@ class BookingController extends AbstractController
         } catch (TicketsSoldOut $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (OptimisticLockException $e) {
-            // Ось тут ми ловимо RACE CONDITION!
+            // Here we catch a race condition (optimistic lock conflict)
             return $this->json(
                 ['error' => 'Sorry, someone just booked the last ticket. Please try again.'],
                 Response::HTTP_CONFLICT // 409 Conflict
