@@ -7,19 +7,19 @@ framework:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
-                    # Ось тут ми налаштовуємо EXCHANGES
-                    # Ми кажемо: використовувати exchange 'messages' типу 'topic'
+                    # Configure AMQP exchanges here
+                    # Use the 'messages' exchange of type 'topic'
                     exchange:
                         name: messages
                         type: topic
 
-                    # Налаштування черги (дека)
+                    # Queue settings
                     queues:
-                        main: ~ # Назва черги 'main'
+                        main: ~ # Queue name: 'main'
             failed:
                 dsn: 'doctrine://default?queue_name=failed'
                 options:
-                    # І ось тут ці опції ДОЗВОЛЕНІ
+                    # These options are allowed here
                     use_notify: true
                     check_delayed_interval: 60000
             # sync: 'sync://'

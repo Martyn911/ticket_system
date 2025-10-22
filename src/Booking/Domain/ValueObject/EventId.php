@@ -13,10 +13,10 @@ final class EventId
         $this->value = $value;
     }
 
-    // Фабричні методи для створення
+    // Factory methods for creation
     public static function fromString(string $id): self
     {
-        // Тут може бути валідація, що рядок є валідним UUID
+        // Here you may validate that the string is a valid UUID
         return new self(Uuid::fromString($id));
     }
 
@@ -25,13 +25,13 @@ final class EventId
         return new self(Uuid::v4());
     }
 
-    // Метод для отримання значення
+    // Method to get the underlying value
     public function toString(): string
     {
         return $this->value->toRfc4122();
     }
 
-    // Ключова вимога VO: Рівність
+    // Key VO requirement: equality semantics
     public function equals(self $other): bool
     {
         return $this->value->equals($other->value);

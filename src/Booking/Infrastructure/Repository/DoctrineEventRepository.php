@@ -19,7 +19,7 @@ class DoctrineEventRepository implements EventRepositoryInterface
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->em = $entityManager;
-        // Створюємо "помічника" для легкого пошуку
+        // Create a helper repository to simplify lookups
         $this->entityRepository = $this->em->getRepository(Event::class);
     }
 

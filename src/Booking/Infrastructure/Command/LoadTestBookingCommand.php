@@ -38,15 +38,15 @@ class LoadTestBookingCommand extends Command
         $this->entityManager->flush();
         $io->note('Created new test event with ID: '.$testEvent->getId());
 
-        // 1. Створення тимчасового JSON-файлу
+        // 1. Create a temporary JSON file
         $jsonFilePath = sys_get_temp_dir().'/ab_post_data.json';
         file_put_contents($jsonFilePath, '{"clientId": "'.$testEvent->getId().'", "clientEmail": "test@example.com"}');
 
-        // 2. Формування команди ab
-        // Використовуємо імена сервісів Docker (nginx) та внутрішній порт (80)
+        // 2. Build the ab command
+        // Use Docker service names (nginx) and the internal port (80)
         $url = self::HOST.'/api/events/'.$testEvent->getId().'/book';
 
-        // Команда: 10 запитів (-n) з 10 одночасними клієнтами (-c)
+        // Command: 10 requests (-n) with 10 concurrent clients (-c)
         $command = [
             'ab',
             '-n', '10',
@@ -56,14 +56,14 @@ class LoadTestBookingCommand extends Command
             $url,
         ];
 
-        // 3. Виконання команди за допомогою Symfony Process
+        // 3. Execute the command via Symfony Process
         $process = new Process($command);
-        $process->setTimeout(60); // Даємо 60 секунд на виконання
+        $process->setTimeout(60); // Allow 60 seconds to complete
 
         $output->writeln('Executing: '.$process->getCommandLine());
         $process->run();
 
-        // 4. Обробка результату
+        // 4. Handle the result
         if (!$process->isSuccessful()) {
             $io->error("ab command failed. Is 'ab' installed in the php-fpm container? (See Dockerfile)");
             $io->text($process->getErrorOutput());
@@ -71,17 +71,17 @@ class LoadTestBookingCommand extends Command
             return Command::FAILURE;
         }
 
-        // 5. Виведення результату
+        // 5. Output the result
         $io->success('ab test finished successfully. Analyzing results...');
         $output->writeln($process->getOutput());
 
         /*
-         * Complete requests    10    Усі 10 запитів дійшли до сервера.
-         * Failed requests    9    Дев'ять запитів не завершилися успіхом.
-         * Non-2xx responses    9    Дев'ять запитів отримали код HTTP, який не є 2xx (наприклад, 409 Conflict або 400 Bad Request).
+         * Complete requests    10    All 10 requests reached the server.
+         * Failed requests    9    Nine requests did not complete successfully.
+         * Non-2xx responses    9    Nine requests received an HTTP status that is not 2xx (e.g., 409 Conflict or 400 Bad Request).
          */
 
-        // Очищення
+        // Cleanup
         unlink($jsonFilePath);
 
         return Command::SUCCESS;

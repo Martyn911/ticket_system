@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BookingControllerTest extends WebTestCase
 {
-    // Рядок 13: Помилка missingType.property
+    // Line 13: missingType.property error
     private KernelBrowser $client;
 
     private EntityManagerInterface $entityManager;
@@ -25,13 +25,13 @@ class BookingControllerTest extends WebTestCase
         $this->entityManager = static::getContainer()->get('doctrine.orm.entity_manager');
         $this->eventRepository = static::getContainer()->get(EventRepositoryInterface::class);
 
-        // Починаємо транзакцію на початку кожного тесту
+        // Begin a transaction at the start of each test
         $this->entityManager->beginTransaction();
     }
 
     protected function tearDown(): void
     {
-        // Відкочуємо всі зміни в БД після кожного тесту
+        // Roll back all DB changes after each test
         $this->entityManager->rollback();
         parent::tearDown();
     }
@@ -45,14 +45,14 @@ class BookingControllerTest extends WebTestCase
     }
 
     /**
-     * Тест №1: Щасливий шлях (HTTP 202 + Повідомлення в черзі).
+     * Test #1: Happy path (HTTP 202 + message enqueued).
      */
     public function testBookingSuccessful(): void
     {
-        // 1. Створюємо подію з 1 квитком
+        // 1. Create an event with 1 ticket
         $event = $this->createTestEvent(1);
 
-        // 2. Робимо запит
+        // 2. Make a request
         $this->client->request(
             'POST',
             '/api/events/'.$event->getId().'/book',
@@ -61,25 +61,25 @@ class BookingControllerTest extends WebTestCase
             '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
-        // 3. Перевіряємо відповідь
+        // 3. Verify the response
         $this->assertResponseStatusCodeSame(202); // HTTP 202 Accepted
 
-        // 4. Перевіряємо, що повідомлення потрапило в чергу
+        // 4. Verify that the message was sent to the queue
         $transport = static::getContainer()->get('messenger.transport.async');
 
-        // Перевіряємо, що в черзі рівно 1 повідомлення
+        // Ensure there is exactly 1 message in the queue
         $this->assertCount(1, $transport->get());
     }
 
     /**
-     * Тест №2: Квитки закінчилися (HTTP 400).
+     * Test #2: Tickets sold out (HTTP 400).
      */
     public function testBookingFailsWhenNoTicketsLeft(): void
     {
-        // 1. Створюємо подію з 0 квитками
+        // 1. Create an event with 0 tickets
         $event = $this->createTestEvent(0);
 
-        // 2. Робимо запит
+        // 2. Make a request
         $this->client->request(
             'POST',
             '/api/events/'.$event->getId().'/book',
@@ -88,32 +88,32 @@ class BookingControllerTest extends WebTestCase
             '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
-        // 3. Перевіряємо відповідь (це DomainException)
+        // 3. Verify the response (this is a DomainException)
         $this->assertResponseStatusCodeSame(400); // HTTP 400 Bad Request
         $this->assertStringContainsString('No tickets left', (string) $this->client->getResponse()->getContent());
     }
 
     /**
-     * Тест №3: Симуляція Race Condition (HTTP 409).
+     * Test #3: Simulate a race condition (HTTP 409).
      */
     public function testBookingFailsOnRaceCondition(): void
     {
-        // 1. Створюємо подію з 1 квитком
+        // 1. Create an event with 1 ticket
         $event = $this->createTestEvent(1);
 
-        // 2. СИМУЛЮЄМО RACE CONDITION
-        // Ми не можемо створити її по-справжньому, тому ми "мокаємо"
-        // сервіс, щоб він згенерував потрібну нам помилку.
+        // 2. SIMULATE A RACE CONDITION
+        // We can't create a real race condition here, so we mock
+        // the service to throw the desired error.
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         $bookingServiceMock
-            ->method('bookTicket') // При виклику методу bookTicket...
-            ->willThrowException(new OptimisticLockException('Mock lock exception', null)); // ...кинь помилку OptimisticLock
+            ->method('bookTicket') // When calling bookTicket...
+            ->willThrowException(new OptimisticLockException('Mock lock exception', null)); // ...throw OptimisticLockException
 
-        // Замінюємо справжній сервіс на наш мок
+        // Replace the real service with our mock
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
 
-        // 3. Робимо запит
+        // 3. Make a request
         $this->client->request(
             'POST',
             '/api/events/'.$event->getId().'/book',
@@ -122,13 +122,13 @@ class BookingControllerTest extends WebTestCase
             '{"clientId": "'.$event->getId().'", "clientEmail": "test@example.com"}'
         );
 
-        // 4. Перевіряємо, що контролер правильно обробив цю помилку
+        // 4. Verify the controller handled the error correctly
         $this->assertResponseStatusCodeSame(409); // HTTP 409 Conflict
         $this->assertStringContainsString('someone just booked the last ticket', (string) $this->client->getResponse()->getContent());
     }
 
     /**
-     * Тест №4: Некоректний UUID у clientId -> 400.
+     * Test #4: Invalid UUID in clientId -> 400.
      */
     public function testBookingFailsOnInvalidClientId(): void
     {
@@ -145,7 +145,7 @@ class BookingControllerTest extends WebTestCase
     }
 
     /**
-     * Тест №5: Некоректний email -> 400.
+     * Test #5: Invalid email -> 400.
      */
     public function testBookingFailsOnInvalidEmail(): void
     {
