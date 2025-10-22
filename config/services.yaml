@@ -19,18 +19,18 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Kernel.php'
 
-    # Додайте цей блок, щоб Symfony сканував ВСІ контролери в новій структурі
+    # Ensure Symfony scans all controllers in the new folder structure
     App\Booking\UserInterface\Controller\:
         resource: '../src/Booking/UserInterface/Controller/'
         tags: ['controller.service_arguments']
 
-    # Якщо у вас будуть інші домени, ви додасте їх так само
+    # If you add other domains, register their controllers similarly
     # App\Payments\UserInterface\Controller\:
     #    resource: '../src/Payments/UserInterface/Controller/'
     #    tags: ['controller.service_arguments']
 
-    # Цей запис каже Symfony:
-    # "Якщо хтось попросить (type-hint) EventRepositoryInterface..."
+    # This tells Symfony:
+    # "When someone type-hints EventRepositoryInterface..."
     App\Booking\Domain\Repository\EventRepositoryInterface:
-        # "...насправді дай йому сервіс DoctrineEventRepository"
+        # "...actually give them the DoctrineEventRepository service"
         alias: App\Booking\Infrastructure\Repository\DoctrineEventRepository
